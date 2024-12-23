@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "sqlalchemy-practice"
+version = "0.1.0"
+description = ""
+authors = ["Pankrashov Dmitry <dmitry8912@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+alembic = "^1.14.0"
+sqlalchemy = "^2.0.36"
+fastapi = {extras = ["all"], version = "^0.115.6"}
+uvicorn = {extras = ["standard"], version = "^0.34.0"}
+pydantic-settings = "^2.7.0"
+asyncpg = "^0.30.0"
+sqladmin = {extras = ["full"], version = "^0.20.1"}
+psycopg2 = "^2.9.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
