@@ -36,7 +36,9 @@ async def place_order_v1(order_placement: OrderPlacementRequest, session: AsyncS
 @marketplace_router.post("/marketplace/v2/", response_model=OrderPlacementResponse)
 async def place_order_v2(order_placement: OrderPlacementRequest, session: AsyncSession = Depends(get_session)):
     """Commit after all objects saved."""
+    t1 = time.time()
     user = (await session.execute(select(User).where(User.id == order_placement.user_id))).scalars().first()
+    t2 = time.time() - t1
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -56,7 +58,11 @@ async def place_order_v2(order_placement: OrderPlacementRequest, session: AsyncS
 @marketplace_router.post("/marketplace/v3/", response_model=OrderPlacementResponse)
 async def place_order_v3(order_placement: OrderPlacementRequest, session: AsyncSession = Depends(get_session)):
     """Count user orders and balance by query."""
-    user = (await session.execute(select(User).options(noload(User.user_orders)).where(User.id == order_placement.user_id))).scalars().first()
+    t1 = time.time()
+    user = (await session.execute(select(User).options(noload(User.user_orders)).where(
+        User.id == order_placement.user_id
+    ))).scalars().first()
+    t2 = time.time() - t1
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -73,7 +79,7 @@ async def place_order_v3(order_placement: OrderPlacementRequest, session: AsyncS
     orders_count_query = select(count(Order.id)).filter(Order.user_id == user.id).subquery("user_orders")
     query = select(User.balance, orders_count_query).filter(User.id == order_placement.user_id)
     result = (await session.execute(query)).first()
-    return OrderPlacementResponse(total_orders=result[0], available_balance=result[1])
+    return OrderPlacementResponse(total_orders=result[1], available_balance=result[0])
 
 @marketplace_router.post("/marketplace/v4/", response_model=OrderPlacementResponse)
 async def place_order_v4(order_placement: OrderPlacementRequest, session: AsyncSession = Depends(get_session)):
